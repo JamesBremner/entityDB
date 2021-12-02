@@ -26,7 +26,7 @@ namespace raven
             if (db.isOpen())
                 return true;
             std::filesystem::path path(fname);
-            if( ! path.parent_path().empty() )
+            if (!path.parent_path().empty())
                 std::filesystem::create_directories(path.parent_path());
             db.Open(fname);
             if (!db.isOpen())
@@ -442,6 +442,10 @@ namespace raven
             bnDelete.events().click(
                 [this]
                 { remove(); });
+
+            myPG.nameClick(
+                [this](const std::string &propName)
+                { nameClick(propName); });
         }
         void cEntityForm::show(const std::string &id, bool f)
         {
@@ -464,10 +468,38 @@ namespace raven
             for (int k = 0; k < myPropName.size(); k++)
                 myPG.find(myPropName[k])->value(vv[2 * k + 1]);
         }
+        void cEntityForm::link(
+            const std::string &propName,
+            const std::string &linkName)
+        {
+            myLinkMap.insert(std::make_pair(propName, linkName));
+            myPG.string(propName, "");
+        }
+        void cEntityForm::nameClick(
+            const std::string &nameClicked)
+        {
+            // find category linked to
+            auto it = myLinkMap.find(nameClicked);
+            if (it == myLinkMap.end())
+                return;
+            auto dstName = theDB.categoryAttName(
+                theDB.category(it->second), 1);
+
+            // list entities in linked category
+            cEntityList L(dstName, dstName);
+
+            // display selected entity text
+            std::string s;
+            if (!L.mySelected.empty())
+                s = theDB.text(
+                    theDB.category(dstName),
+                    L.mySelected);
+            myPG.find(nameClicked)->value(s);
+        }
         std::vector<std::string> cEntityForm::pgget()
         {
             std::vector<std::string> ret;
-            for ( auto& prop : myPropName )
+            for (auto &prop : myPropName)
             {
                 ret.push_back(
                     myPG.find(prop)->value());

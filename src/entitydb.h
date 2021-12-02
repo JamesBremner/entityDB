@@ -210,20 +210,23 @@ namespace raven
         class cEntityForm
         {
         public:
-        /** CTOR
+            /** CTOR
          * @param[in] parent gui element
          * @param[in] catName category name
          * @param[in] propName vector of property names
-         */ 
+         */
             cEntityForm(
                 wex::gui &parent,
                 const std::string &catName,
-                const std::vector<std::string>& propName);
+                const std::vector<std::string> &propName);
             void show(
                 const std::string &id = "-1",
                 bool f = true);
+            void link(
+                const std::string &propName,
+                const std::string &linkName);
 
-        protected:
+        private:
             wex::panel &myPanel;
             wex::propertyGrid &myPG;
             wex::layout &crud;
@@ -235,9 +238,13 @@ namespace raven
             std::vector<std::string> myPropName;
             std::string myCatName;
             std::string myID;
+            std::map<std::string,std::string> myLinkMap;
 
-            void pgset( const std::vector<std::string>& vv );
+            void pgset(const std::vector<std::string> &vv);
             std::vector<std::string> pgget();
+
+            void nameClick(
+                const std::string &nameClicked);
 
             void create();
             void read();
