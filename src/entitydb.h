@@ -23,13 +23,29 @@ namespace raven
          * If the category is already in the database
          * the database specification is used.  Do not use to change the specification!
          * 
-         * If a vategory of this name is not in the database
+         * If a category of this name is not in the database
          * one will be added.
          * 
          */
         void createCategory(
             const std::string &name,
             const std::vector<std::string> &van);
+
+        /** create link between two categories
+         * @param[in] linkname
+         * @param[in] srcname category name where linkstarts
+         * @param[in] dstname category name where link endss
+         * 
+         * If categories do not exist, throws an exception
+         * 
+         * The link must be 1:1.  That is the source entity can have only
+         * one of these links.  ( The destination can have many )
+         * 
+         */
+        void createLink(
+            const std::string &linkname,
+            const std::string &srcname,
+            const std::string &dstname);
 
         /**  Base class for all entities
          * 
@@ -125,6 +141,11 @@ namespace raven
                 const std::string &name,
                 const std::vector<std::string> &van);
 
+            void createLink(
+                const std::string &linkname,
+                const std::string &srcname,
+                const std::string &dstname);
+
             /** Add new entity to database
              * @param[in] category
              * @param[in] nv name-values
@@ -211,17 +232,33 @@ namespace raven
         {
         public:
             /** CTOR
-         * @param[in] parent gui element
-         * @param[in] catName category name
-         * @param[in] propName vector of property names
-         */
+             * @param[in] parent gui element
+             * @param[in] catName category name
+             * @param[in] propName vector of property labels
+             */
             cEntityForm(
                 wex::gui &parent,
                 const std::string &catName,
                 const std::vector<std::string> &propName);
+
+            /** Show/Hide the form
+             * @param[in] id id of entity to be edited, default -1
+             * @param[in] f show flag, true to show
+             * 
+             * id of -1 shows a new, blank entity
+             */
             void show(
                 const std::string &id = "-1",
                 bool f = true);
+
+            /** Add link to another category
+             * @param[in] propName propert label
+             * @param[in] link category name
+             * 
+             * The source of the link must be the category of the entity being edited.
+             * 
+             * User clicks on the property title to pop up a list of the entities in the destination category
+             */
             void link(
                 const std::string &propName,
                 const std::string &linkName);
@@ -238,11 +275,16 @@ namespace raven
             std::vector<std::string> myPropName;
             std::string myCatName;
             std::string myID;
-            std::map<std::string,std::string> myLinkMap;
+            std::map<std::string, std::string> myLinkMap;
 
             void pgset(const std::vector<std::string> &vv);
             std::vector<std::string> pgget();
 
+            /** Invoked when user clicks on property label
+             * 
+             * For an attribute, this is ignored.
+             * for a link, user can select an entity to be the link destination
+             */
             void nameClick(
                 const std::string &nameClicked);
 

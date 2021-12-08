@@ -20,6 +20,13 @@ namespace raven
         {
             theDB.createCategory(name, van);
         }
+        void createLink(
+            const std::string &linkname,
+            const std::string &srcname,
+            const std::string &dstname)
+        {
+            theDB.createLink(linkname, srcname, dstname);
+        }
 
         bool cDB::open(const std::string &fname)
         {
@@ -104,6 +111,20 @@ namespace raven
                       << myMapCategory.size()
                       << " " << name << "\n";
             return atoi(rowid.c_str());
+        }
+
+        void cDB::createLink(
+            const std::string &linkname,
+            const std::string &srcname,
+            const std::string &dstname)
+        {
+            if (category(srcname) == -1)
+                throw std::runtime_error("Attempt to create link with unknown category");
+            if (category(dstname) == -1)
+                throw std::runtime_error("Attempt to create link with unknown category");
+            createCategory(
+                linkname,
+                {srcname, dstname});
         }
 
         void cDB::categoryRead(
@@ -503,6 +524,11 @@ namespace raven
             {
                 ret.push_back(
                     myPG.find(prop)->value());
+            }
+            for( auto& s : ret )
+            {
+                if( s.find("'") != -1 )
+                    throw std::runtime_error("Property value contains |'| ");
             }
             return ret;
         }

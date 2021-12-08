@@ -41,10 +41,18 @@ cApp::cApp()
         "child",
         {"first", "last", "parent"});
 
-    raven::edb::createCategory(
+    raven::edb::createLink(
         "childof",
-        {"child","parent"});
+        "child",
+        "parent");
     myChildForm.link("Parent","childof");
+
+    raven::edb::createLink(
+        "spouse",
+        "parent",
+        "parent");
+    myParentForm.link("Spouse", "spouse" );
+
 
     myForm.move({50, 50, 600, 800});
     myForm.text("Family");
